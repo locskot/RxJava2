@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
 //        repeatWhen();
 //        scan();
 
+
 //          Reducing operators
         // TODO: 11.07.2018 USE only with finite observable
 //        count();
