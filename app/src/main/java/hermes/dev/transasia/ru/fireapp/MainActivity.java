@@ -737,13 +737,30 @@ public class MainActivity extends AppCompatActivity {
                 .map(l -> l + 1)
                 .map(l -> "Source1: " + l + " seconds");
         Observable<String> s2 = Observable.interval(300, TimeUnit.MILLISECONDS)
-                        .map(l -> (l + 1) * 300)
-                        .map(l -> "Source2: " + l + " milliseconds");
+                .map(l -> (l + 1) * 300)
+                .map(l -> "Source2: " + l + " milliseconds");
         compositeDisposable.add(Observable.merge(s1, s2).subscribe(result -> Log.d(TAG, "FOURTH: " + result)));
 
         sleep(3000);
     }
 
+    public void flatMap() {
+        Log.d(TAG, "flatMap: part one");
+        compositeDisposable.add(getJustStringObservable()
+                .flatMap(s -> Observable.fromArray(s.split("")))
+                .subscribe(s -> Log.d(TAG, "flatMap: " + s)));
+
+        Log.d(TAG, " ");
+        compositeDisposable.add(Observable.just("23123/123123/Tango", "23213/12312111/Cat", "4324/1312/Peyot")
+                .flatMap(s -> Observable.fromArray(s.split("/")))
+                .filter(s -> s.matches("[0-9]+"))
+                .map(Integer::valueOf)
+                .subscribe(s -> Log.d(TAG, "flatMap: " + s)));
+        Log.d(TAG, "flatMap: part two");
+
+        Log.d(TAG, " ");
+        Log.d(TAG, "flatMap: part three");
+    }
 
 
     private Observable<Integer> getJustIntegerObservable() {
