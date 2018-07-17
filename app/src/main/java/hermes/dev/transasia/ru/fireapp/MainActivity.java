@@ -106,9 +106,11 @@ public class MainActivity extends AppCompatActivity {
 
         //Combining operators
 //        merge();
+//        flatMap();
 
 
     }
+
 
 
     public void filter() {
@@ -309,9 +311,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void map() {
+
         compositeDisposable.add(getJustStringObservable()
                 .map(s -> s + " " + s.length())
                 .subscribe(d -> Log.d(TAG, "map: " + d)));
+
+
+        compositeDisposable.add(getJustStringObservable()
+                .map(s-> {
+                    if (s.length() % 2 == 0){
+                        return new Pair<>(s, true);
+                    } else return new Pair<>(s, false);
+                })
+                .subscribe(res -> Log.d(TAG, "map: " + res.first  + " " + res.second)));
     }
 
     public void cast() {
@@ -759,6 +771,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "flatMap: part two");
 
         Log.d(TAG, " ");
+
         Log.d(TAG, "flatMap: part three");
     }
 
