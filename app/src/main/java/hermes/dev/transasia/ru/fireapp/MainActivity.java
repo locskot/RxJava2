@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.SingleObserver;
+import io.reactivex.SingleSource;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BooleanSupplier;
@@ -791,14 +793,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void flatMapIterable(){
         compositeDisposable.add(getListString()
-        .flatMapIterable(new Function<List<String>, Iterable<String>>() {
-            @Override
-            public Iterable<String> apply(List<String> item) throws Exception {
-                return item;
-            }
-        })
+        .flatMapIterable((Function<List<String>, Iterable<String>>) item -> item)
         .subscribe(result -> Log.d(TAG, "flatMapIterable: " + result)));
     }
+
+    public void flatMapSingle(){
+        compositeDisposable.add(Observable.just("query")
+//                .flatMapSingle()
+                .subscribe(result -> Log.d(TAG, "flatMapIterable: " + result)));
+    }
+
 
 
     private Observable<Integer> getJustIntegerObservable() {
