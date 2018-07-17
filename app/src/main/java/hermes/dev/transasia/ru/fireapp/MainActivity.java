@@ -8,8 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Maybe;
@@ -106,11 +108,11 @@ public class MainActivity extends AppCompatActivity {
 
         //Combining operators
 //        merge();
-//        flatMap();
+        flatMap();
+        flatMapIterable();
 
 
     }
-
 
 
     public void filter() {
@@ -318,12 +320,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         compositeDisposable.add(getJustStringObservable()
-                .map(s-> {
-                    if (s.length() % 2 == 0){
+                .map(s -> {
+                    if (s.length() % 2 == 0) {
                         return new Pair<>(s, true);
                     } else return new Pair<>(s, false);
                 })
-                .subscribe(res -> Log.d(TAG, "map: " + res.first  + " " + res.second)));
+                .subscribe(res -> Log.d(TAG, "map: " + res.first + " " + res.second)));
     }
 
     public void cast() {
@@ -761,18 +763,41 @@ public class MainActivity extends AppCompatActivity {
         compositeDisposable.add(getJustStringObservable()
                 .flatMap(s -> Observable.fromArray(s.split("")))
                 .subscribe(s -> Log.d(TAG, "flatMap: " + s)));
-
         Log.d(TAG, " ");
+
+        Log.d(TAG, "flatMap: part two");
         compositeDisposable.add(Observable.just("23123/123123/Tango", "23213/12312111/Cat", "4324/1312/Peyot")
                 .flatMap(s -> Observable.fromArray(s.split("/")))
                 .filter(s -> s.matches("[0-9]+"))
                 .map(Integer::valueOf)
                 .subscribe(s -> Log.d(TAG, "flatMap: " + s)));
-        Log.d(TAG, "flatMap: part two");
-
         Log.d(TAG, " ");
 
         Log.d(TAG, "flatMap: part three");
+        compositeDisposable.add(getRangeIntObservable(1, 3)
+                .flatMap(number -> Observable.interval(number, TimeUnit.SECONDS))
+                .map(newNumber -> newNumber + " seconds")
+                .subscribe(result -> Log.d(TAG, "flatMap: " + result)));
+        sleep(12000);
+        Log.d(TAG, " ");
+
+        Log.d(TAG, "flatMap: part four");
+        compositeDisposable.add(getJustStringObservable()
+                .flatMap(string -> Observable.fromArray(string.split("")),
+                        (string, split) -> string + "-" + split)
+                .subscribe(result -> Log.d(TAG, "flatMap: " + result)));
+        Log.d(TAG, " ");
+    }
+
+    public void flatMapIterable(){
+        compositeDisposable.add(getListString()
+        .flatMapIterable(new Function<List<String>, Iterable<String>>() {
+            @Override
+            public Iterable<String> apply(List<String> item) throws Exception {
+                return item;
+            }
+        })
+        .subscribe(result -> Log.d(TAG, "flatMapIterable: " + result)));
     }
 
 
@@ -798,6 +823,20 @@ public class MainActivity extends AppCompatActivity {
 
     public Maybe<String> getStringMaybe() {
         return Maybe.just("Android Version");
+    }
+
+    public Observable<List<String>> getListString(){
+        List<String> list = new ArrayList<>();
+        list.add("Hi");
+        list.add("Bonjour");
+        list.add("Privet");
+
+        List<String> list2 = new ArrayList<>();
+        list2.add("Bye");
+        list2.add("OreVoua");
+        list2.add("Poka");
+
+        return Observable.just(list, list2);
     }
 
 
