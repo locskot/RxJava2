@@ -805,6 +805,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     private Observable<Integer> getJustIntegerObservable() {
         return Observable.just(5, 2, 4, 0, 3, 2, 8);
     }
