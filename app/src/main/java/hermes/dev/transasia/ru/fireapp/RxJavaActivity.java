@@ -8,8 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Maybe;
@@ -17,10 +20,12 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.BooleanSupplier;
 import io.reactivex.functions.Function;
+import io.reactivex.observables.GroupedObservable;
 
-public class MainActivity extends AppCompatActivity {
+public class RxJavaActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
     private BottomNavigationView navigation;
@@ -107,10 +112,15 @@ public class MainActivity extends AppCompatActivity {
         //Combining operators
 //        merge();
 //        flatMap();
-
-
+//        flatMapIterable();
+//        concat();
+//        concatMap();
+//        amb();
+//        zip();
+//        combineLatest();
+//        withLatestFrom();
+//        groupBy();
     }
-
 
 
     public void filter() {
@@ -318,12 +328,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         compositeDisposable.add(getJustStringObservable()
-                .map(s-> {
-                    if (s.length() % 2 == 0){
+                .map(s -> {
+                    if (s.length() % 2 == 0) {
                         return new Pair<>(s, true);
                     } else return new Pair<>(s, false);
                 })
-                .subscribe(res -> Log.d(TAG, "map: " + res.first  + " " + res.second)));
+                .subscribe(res -> Log.d(TAG, "map: " + res.first + " " + res.second)));
     }
 
     public void cast() {
@@ -681,7 +691,7 @@ public class MainActivity extends AppCompatActivity {
                 .retryWhen(new Function<Observable<Throwable>, ObservableSource<?>>() {
                     @Override
                     public ObservableSource<?> apply(Observable<Throwable> throwableObservable) throws Exception {
-                        return MainActivity.this.getJustStringObservable();
+                        return RxJavaActivity.this.getJustStringObservable();
                     }
                 })
                 .subscribe(i -> Log.d(TAG, "retryWhen: onNext " + i),
@@ -761,19 +771,143 @@ public class MainActivity extends AppCompatActivity {
         compositeDisposable.add(getJustStringObservable()
                 .flatMap(s -> Observable.fromArray(s.split("")))
                 .subscribe(s -> Log.d(TAG, "flatMap: " + s)));
-
         Log.d(TAG, " ");
+
+        Log.d(TAG, "flatMap: part two");
         compositeDisposable.add(Observable.just("23123/123123/Tango", "23213/12312111/Cat", "4324/1312/Peyot")
                 .flatMap(s -> Observable.fromArray(s.split("/")))
                 .filter(s -> s.matches("[0-9]+"))
                 .map(Integer::valueOf)
                 .subscribe(s -> Log.d(TAG, "flatMap: " + s)));
-        Log.d(TAG, "flatMap: part two");
-
         Log.d(TAG, " ");
 
         Log.d(TAG, "flatMap: part three");
+        compositeDisposable.add(getRangeIntObservable(1, 3)
+                .flatMap(number -> Observable.interval(number, TimeUnit.SECONDS))
+                .map(newNumber -> newNumber + " seconds")
+                .subscribe(result -> Log.d(TAG, "flatMap: " + result)));
+        sleep(12000);
+        Log.d(TAG, " ");
+
+        Log.d(TAG, "flatMap: part four");
+        compositeDisposable.add(getJustStringObservable()
+                .flatMap(string -> Observable.fromArray(string.split("")),
+                        (string, split) -> string + "-" + split)
+                .subscribe(result -> Log.d(TAG, "flatMap: " + result)));
+        Log.d(TAG, " ");
     }
+
+    public void flatMapIterable() {
+        compositeDisposable.add(getListString()
+                .flatMapIterable((Function<List<String>, Iterable<String>>) item -> item)
+                .subscribe(result -> Log.d(TAG, "flatMapIterable: " + result)));
+    }
+
+    public void flatMapSingle() {
+        compositeDisposable.add(Observable.just("query")
+//                .flatMapSingle()
+                .subscribe(result -> Log.d(TAG, "flatMapIterable: " + result)));
+    }
+
+    public void flatMapMaybe(List<Integer> ids) {
+//            return Observable.fromIterable(ids)
+//                    .flatMapMaybe((id) -> getUser(id))
+//                    .toList()
+//                    .flatMapMaybe((list) -> {
+//                        if (list.isEmpty()) {
+//                            return Maybe.empty();
+//                        } else {
+//                            return Maybe.just(list);
+//                        }
+//                    });
+//        }
+    }
+
+    public void concat() {
+        Observable<String> source1 = Observable.interval(1, TimeUnit.SECONDS)
+                .take(2)
+                .map(l -> l + 1) // emit elapsed seconds
+                .map(l -> "Source1: " + l + " seconds");
+
+        Observable<String> source2 = Observable.interval(300, TimeUnit.MILLISECONDS)
+                .map(l -> (l + 1) * 300) // emit elapsed milliseconds
+                .map(l -> "Source2: " + l + " milliseconds");
+
+        compositeDisposable.add(Observable.concat(source1, source2)
+                .subscribe(i -> Log.d(TAG, "concat: " + i)));
+
+        sleep(5000);
+    }
+
+    public void concatMap() {
+
+        Observable<String> s1 = getJustStringObservable();
+
+        compositeDisposable.add(s1.concatMap(s -> Observable.fromArray(s.split("")))
+                .count()
+                .subscribe(result -> Log.d(TAG, "concatMap: " + result)));
+
+        compositeDisposable.add(s1.concatMap(s -> Observable.fromArray(s.split("")))
+                .subscribe(i -> Log.d(TAG, "concatMap 2: " + i)));
+    }
+
+    public void amb() {
+
+        Observable<String> source1 = Observable.interval(1, TimeUnit.SECONDS)
+                .take(2)
+                .map(l -> l + 1) // emit elapsed seconds
+                .map(l -> "Source1: " + l + " seconds");
+
+        Observable<String> source2 = Observable.interval(300, TimeUnit.MILLISECONDS)
+                .map(l -> (l + 1) * 300) // emit elapsed milliseconds
+                .map(l -> "Source2: " + l + " milliseconds");
+
+        compositeDisposable.add(source1.ambWith(source2)
+                .subscribe(result -> Log.d(TAG, "amb: " + result)));
+
+        compositeDisposable.add(Observable.amb(Arrays.asList(source1, source2))
+                .subscribe());
+    }
+
+    public void zip() {
+        Observable<String> s1 = getJustStringObservable();
+        Observable<String> s2 = getJustStringDateobservable();
+
+        compositeDisposable.add(Observable.zip(s1, s2, Pair::new)
+                .subscribe(res -> Log.d(TAG, "zip: " + res)));
+    }
+
+    public void combineLatest() {
+        Observable<String> s1 = getJustStringObservable();
+        Observable<String> s2 = getJustStringDateobservable();
+
+        compositeDisposable.add(Observable.combineLatest(s1, s2, Pair::new)
+                .subscribe(result -> Log.d(TAG, "combineLatest: " + result)));
+    }
+
+    public void withLatestFrom() {
+        Observable<Long> source1 = Observable.interval(300, TimeUnit.MILLISECONDS);
+        Observable<Long> source2 = Observable.interval(1, TimeUnit.SECONDS);
+        compositeDisposable.add(source2.withLatestFrom(source1, new BiFunction<Long, Long, String>() {
+            @Override
+            public String apply(Long l1, Long l2) throws Exception {
+                return "SOURCE 2: " + l1 + " SOURCE 1: " + l2;
+            }
+        })
+                .subscribe(res -> Log.d(TAG, "withLatestFrom: " + res)));
+    }
+
+    public void groupBy() {
+        Observable<String> source = getJustStringObservable();
+        Observable<GroupedObservable<Integer, String>> byLengths = source.groupBy(String::length);
+
+        compositeDisposable.add(byLengths
+                .flatMapSingle(Observable::toList)
+//                .toList()
+                .subscribe(res -> Log.d(TAG, "groupBy: " + res)));
+    }
+
+
 
 
     private Observable<Integer> getJustIntegerObservable() {
@@ -798,6 +932,20 @@ public class MainActivity extends AppCompatActivity {
 
     public Maybe<String> getStringMaybe() {
         return Maybe.just("Android Version");
+    }
+
+    public Observable<List<String>> getListString() {
+        List<String> list = new ArrayList<>();
+        list.add("Hi");
+        list.add("Bonjour");
+        list.add("Privet");
+
+        List<String> list2 = new ArrayList<>();
+        list2.add("Bye");
+        list2.add("OreVoua");
+        list2.add("Poka");
+
+        return Observable.just(list, list2);
     }
 
 
