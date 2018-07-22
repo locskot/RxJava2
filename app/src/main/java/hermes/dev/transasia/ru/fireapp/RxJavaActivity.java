@@ -96,10 +96,10 @@ public class RxJavaActivity extends AppCompatActivity {
 //        collect();
 
 //          Error recovery operations
-//        onErrorReturnItem();
-//        onErrorReturn();
-//        handleErrorWithMap();
-//        onErrorResumeNext();
+        onErrorReturnItem();
+        onErrorReturn();
+        handleErrorWithMap();
+        onErrorResumeNext();
 //        retry();
 //        retryUntil();
 //        retryWhen();
