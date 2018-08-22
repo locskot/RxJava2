@@ -799,7 +799,12 @@ public class RxJavaActivity extends AppCompatActivity {
 
     public void flatMapIterable() {
         compositeDisposable.add(getListString()
-                .flatMapIterable((Function<List<String>, Iterable<String>>) item -> item)
+                .flatMapIterable(new Function<List<String>, Iterable<String>>() {
+                    @Override
+                    public Iterable<String> apply(List<String> item) throws Exception {
+                        return item;
+                    }
+                })
                 .subscribe(result -> Log.d(TAG, "flatMapIterable: " + result)));
     }
 
