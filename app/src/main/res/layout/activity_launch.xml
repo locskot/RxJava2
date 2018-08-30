@@ -17,4 +17,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Patterns" />
+
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/switch_night_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="28dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="sans-serif-medium"
+        android:switchPadding="5dp"
+        android:text="Ночной режим"
+        android:textColor="#ffffff"
+        android:textSize="20sp"
+        android:textStyle="normal" />
+
 </LinearLayout>
