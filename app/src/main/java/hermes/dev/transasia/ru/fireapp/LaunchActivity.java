@@ -5,12 +5,15 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.widget.Button;
 
 public class LaunchActivity extends AppCompatActivity {
 
     private Button rxJava;
     private Button Patterns;
+
+    private static final String TAG = "tag__";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +53,43 @@ public class LaunchActivity extends AppCompatActivity {
         };
 
         switchNightMode.setTrackTintList(new ColorStateList(states, colors));
+
+
+
+      Log.d(TAG, "onCreate: ");
     }
 
     private void initView() {
         rxJava = (Button) findViewById(R.id.rxJava);
         Patterns = (Button) findViewById(R.id.Patterns);
     }
+
+  @Override protected void onStart() {
+    super.onStart();
+
+    Log.d(TAG, "onStart: ");
+
+  }
+
+  @Override protected void onResume() {
+    super.onResume();
+
+    Log.d(TAG, "onResume: ");
+  }
+
+  @Override protected void onPause() {
+    super.onPause();
+
+    Log.d(TAG, "onPause: ");
+  }
+
+  @Override protected void onStop() {
+    super.onStop();
+    Log.d(TAG, "onStop: ");
+  }
+
+  @Override protected void onDestroy() {
+    super.onDestroy();
+    Log.d(TAG, "onDestroy: ");
+  }
 }
