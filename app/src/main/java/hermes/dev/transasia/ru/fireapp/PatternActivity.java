@@ -1,13 +1,13 @@
 package hermes.dev.transasia.ru.fireapp;
 
 import android.os.Bundle;
-import android.support.v4.util.Pair;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.util.Pair;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
 import hermes.dev.transasia.ru.fireapp.patterns.mediator.ChatServer;
 import hermes.dev.transasia.ru.fireapp.patterns.mediator.Client1;
 import hermes.dev.transasia.ru.fireapp.patterns.mediator.Client2;

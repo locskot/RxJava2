@@ -2,11 +2,11 @@ package hermes.dev.transasia.ru.fireapp;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.util.Pair;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.util.Pair;
 import android.util.Log;
 import android.widget.TextView;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import androidx.appcompat.app.AppCompatActivity;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -100,20 +101,20 @@ public class RxJavaActivity extends AppCompatActivity {
         onErrorReturn();
         handleErrorWithMap();
         onErrorResumeNext();
-//        retry();
-//        retryUntil();
-//        retryWhen();
+        retry();
+        retryUntil();
+        retryWhen();
 
-//        Actions operators
-//        doOnError();
-//        doOnSuccess();
-//        do_s_Other();
+        //Actions operators
+        doOnError();
+        doOnSuccess();
+        do_s_Other();
 
         //Combining operators
 //        merge();
 //        flatMap();
 //        flatMapIterable();
-//        concat();
+        concat();
 //        concatMap();
 //        amb();
 //        zip();
@@ -769,7 +770,12 @@ public class RxJavaActivity extends AppCompatActivity {
     public void flatMap() {
         Log.d(TAG, "flatMap: part one");
         compositeDisposable.add(getJustStringObservable()
-                .flatMap(s -> Observable.fromArray(s.split("")))
+                .flatMap(new Function<String, ObservableSource<? extends String>>() {
+                    @Override public ObservableSource<? extends String> apply(String s)
+                        throws Exception {
+                        return Observable.fromArray(s.split(""));
+                    }
+                })
                 .subscribe(s -> Log.d(TAG, "flatMap: " + s)));
         Log.d(TAG, " ");
 
